@@ -1,0 +1,239 @@
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Test task</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="calendar.js" type="text/javascript"></script>
+</head>
+<body>
+	<label> Курс валюты за период </label>
+	<form action="">
+с <input type="text"  id="ifrom" onfocus="this.select();lcs(this)"
+	onclick="event.cancelBubble=true;this.select();lcs(this)">
+по <input type="text"  id="ito" onfocus="this.select();lcs(this)"
+	onclick="event.cancelBubble=true;this.select();lcs(this)">
+</p>
+</form>
+    <!-- <span id="period"> с: <input type="text" id="ifrom" /> по: <input type="text" id="ito" /></span> -->
+    <input type="button" id="btn" value="получить" />
+    <div class="searchInput">
+           <input type="text" onkeyup = "" id="input" placeholder="EUR">
+     </div>
+     <div class="fakeButton" >
+                        <button id="elastic" onclick="searchFunction()">Search</button>
+                    </div>
+
+    <table border = " 1" style="overflow-y:scroll" id="res">
+      <tr id="res_Date" class="bigText"></tr>
+      <tr id="res_EUR" class="bigText"></tr>
+      <tr id="res_USD" class="bigText"></tr>
+      <tr id="res_RUR" class="bigText"></tr>
+    </table>
+</body>
+ <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+<script  type="text/javascript">
+	 var uri = 'https://www.nbrb.by/API/';
+      $('#btn').click(function () {
+                $('#res_Date').empty();
+                $('#res_EUR').empty();
+                $('#res_USD').empty();
+                $('#res_RUR').empty();
+                $('#btn').attr("disabled", "disabled");
+                
+                        ratedyn();
+                        
+                });
+           
+     function ratedyn() {
+      let td_First = document.createElement("td");
+      td_First.innerHTML = `${"Дата:" }`;
+      document
+       .querySelector("#res_Date")
+       .appendChild(td_First);
+       let td_First_E  = document.createElement("td");
+       td_First_E.innerHTML = `${"EUR:" }`;
+       document
+      .querySelector("#res_EUR")
+      .appendChild(td_First_E);
+       let td_First_U = document.createElement("td");
+       td_First_U.innerHTML = `${"USD:" }`;
+       document
+      .querySelector("#res_USD")
+      .appendChild(td_First_U);
+      let td_First_R = document.createElement("td");
+       td_First_R.innerHTML = `${"RUR:" }`;
+       document
+      .querySelector("#res_RUR")
+      .appendChild(td_First_R);
+                  $.getJSON(uri + 'ExRates/Rates/Dynamics/' + 292, { 'startDate': ($('#ifrom').val()), 'endDate': ($('#ito').val()) })
+              .done(function (data) {
+              	let data_Array = data;
+                add_Date();
+                add_EUR();
+                function add_Date() {
+                   data_Array.map(data => {
+                      
+                      let td = document.createElement("td");
+                      for (let i = 0; i<10; i++){
+                      td.innerHTML += `${data.Date[i]}`;};                      
+                      document
+                       .querySelector("#res_Date")
+                       .appendChild(td);
+
+                  })
+                }
+                 
+                 function add_EUR() {
+                    let max = 0;
+                    let min = data[0].Cur_OfficialRate;
+                    let count = 0;
+                   data_Array.map(data => {
+                    
+                      let td = document.createElement("td");
+                      td.classList.add("eur");
+                      if (data.Cur_OfficialRate > max)
+                      {
+                        max = data.Cur_OfficialRate;
+                      }
+                      if (data.Cur_OfficialRate < min)
+                      {
+                        min = data.Cur_OfficialRate;
+                      }
+                      td.innerHTML = `${data.Cur_OfficialRate}`;
+                      count +=1;
+                      document
+                       .querySelector("#res_EUR")
+                       .appendChild(td);
+                       })
+                      let doc = document.querySelectorAll(".eur");
+                      let table = document.querySelector("#res");   
+                      for (let i = 0; i<doc.length; i++)
+                       {
+                        if (doc[i].innerHTML == max)
+                        {
+                          table.rows[1].cells[i+1].style.color = '#32CD32';
+                        }
+                        if (doc[i].innerHTML == min)
+                        {
+                          table.rows[1].cells[i+1].style.color = '#FF0000'
+                        }
+                       }
+                }
+
+                $.getJSON(uri + 'ExRates/Rates/Dynamics/' +145, { 'startDate': ($('#ifrom').val()), 'endDate': ($('#ito').val()) })
+                .done(function (data) {
+                let data_Array = data;
+                add_USD();
+                function add_USD() {
+                    let max = 0;
+                    let min = data[0].Cur_OfficialRate;
+                    let count = 0;
+                   data_Array.map(data => {
+                    
+                      let td = document.createElement("td");
+                      td.classList.add("usd");
+                       if (data.Cur_OfficialRate > max)
+                      {
+                        max = data.Cur_OfficialRate;
+                      }
+                      if (data.Cur_OfficialRate < min)
+                      {
+                        min = data.Cur_OfficialRate;
+                      }
+                      td.innerHTML = `${data.Cur_OfficialRate}`;
+                      count +=1;
+                      document
+                       .querySelector("#res_USD")
+                       .appendChild(td);
+                  })
+                     let doc = document.querySelectorAll(".usd");
+                      let table = document.querySelector("#res");   
+                      for (let i = 0; i<doc.length; i++)
+                       {
+                        if (doc[i].innerHTML == max)
+                        {
+                          table.rows[2].cells[i+1].style.color = '#32CD32';
+                        }
+                        if (doc[i].innerHTML == min)
+                        {
+                          table.rows[2].cells[i+1].style.color = '#FF0000'
+                        }
+                      }
+                 }
+                })
+                $.getJSON(uri + 'ExRates/Rates/Dynamics/' +298, { 'startDate': ($('#ifrom').val()), 'endDate': ($('#ito').val()) })
+                .done(function (data) {
+                let data_Array = data;
+                add_RUR();
+                function add_RUR() {
+                    let max = 0;
+                    let min = data[0].Cur_OfficialRate/100;
+                    let count = 0;
+                   data_Array.map(data => {
+                      let td = document.createElement("td");
+                      td.classList.add("rur");
+                      let rur = data.Cur_OfficialRate/100;
+                      if (rur > max)
+                      {
+                        max = rur;
+                      }
+                      if (rur < min)
+                      {
+                        min = rur;
+                      }
+                      td.innerHTML = `${rur.toFixed(4)}`;
+                      count +=1;
+                      document
+                       .querySelector("#res_RUR")
+                       .appendChild(td);
+
+                  })
+                      let doc = document.querySelectorAll(".rur");
+                      let table = document.querySelector("#res");   
+                      for (let i = 0; i<doc.length; i++)
+                       {
+                        if (doc[i].innerHTML == max.toFixed(4))
+                        {
+                          table.rows[3].cells[i+1].style.color = '#32CD32';
+                        }
+                        if (doc[i].innerHTML == min.toFixed(4))
+                        {
+                          table.rows[3].cells[i+1].style.color = '#FF0000'
+                        }
+                      }
+                 }
+                })
+                  /*$.each(data, function (key, item) {
+                      $('<td>', { text: JSON.stringify(item.Date) }).appendTo($('#res'));
+                  });*/
+                  $('#btn').removeAttr("disabled");
+              }).error(function (err) {
+                  $('#btn').removeAttr("disabled");
+                  alert('ошибка');
+              });
+              }
+    function searchFunction() {
+    var input, filter, res, rows, p, i, txtValue, txtValue2 ;
+    input = document.getElementById("input");
+    filter = input.value;
+    res = document.querySelector("#res");
+
+    rows = res.getElementsByTagName("tr");
+    let columns = res.getElementsByTagName("td");
+    let table = document.getElementById("res");
+    for (i = 0; i < rows.length; i++) {
+          p = table.rows[i].cells[0];
+        if (p.innerHTML.indexOf(filter) > -1){
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+      
+    }
+
+}
+
+
+</script>
+</html>
